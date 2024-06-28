@@ -54,6 +54,7 @@ const InfoBox = styled<any>(Box)(({ theme, count }) => ({
 
 const BadgeDetail = props => {
   const { detail, metadata, loading, breadcrumb, property, children } = props
+  console.log("BadgeDetail", props)
   const { isLandscape } = useCheckViewport()
   const [actionHeight, setActionHeight] = useState("auto")
   const [isOverflow, setIsOverflow] = useState(false)

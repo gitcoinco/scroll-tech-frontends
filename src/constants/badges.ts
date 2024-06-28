@@ -1,6 +1,3 @@
-import { ethers } from "ethers"
-
-import GitcoinPassportDecoderABI from "@/assets/abis/GitcoinPassportDecoder.json"
 import { isMainnet, requireEnv } from "@/utils"
 
 export const BADGES_ADDRESS = {
@@ -37,6 +34,8 @@ export const BADGES_ADDRESS = {
     PENCILS_BADGE_ADDRESS: "",
     PENCILS_ATTESTER_PROXY_ADDRESS: "",
     Pencils_BASE_URL: "",
+    PASSPORT_SCORE_PROXY_ADDRESS: "0x39571bbd5a4c5d1a5184004c63f45fe426db85ea",
+    PASSPORT_SCORE_BASE_URL: "http://localhost:3003/scroll",
   },
   mainnet: {
     SCROLL_SIMPLE_BADGE_A_ADDRESS: "0xB1Dbd079c62d181926E5A54932Bb1b15F760e8A0",
@@ -59,7 +58,9 @@ export const BADGES_ADDRESS = {
     ZEBRA_ATTESTER_PROXY_ADDRESS: "0x69D872fbBdb71CF3599A0Ee29D4115C3FC31745E",
     Zebra_BASE_URL: "https://zebra.xyz/api/badge",
 
-    PASSPORT_SCORE_BADGE_ADDRESS: "0xc4858e4D177Bf0d14571F91401492d62aa608047",
+    PASSPORT_SCORE_BADGE_ADDRESS: "0x18d6edd0a6ffec7cf82d87c4212b426f5f949866",
+    PASSPORT_SCORE_PROXY_ADDRESS: "0x39571bbd5a4c5d1a5184004c63f45fe426db85ea",
+    PASSPORT_SCORE_BASE_URL: "http://localhost:3003/scroll",
 
     SCROLLY_BADGE_ADDRESS: "0x89b27e836BF46275e6D87cD55461D34ABaade51A",
     SCROLLY_ATTESTER_PROXY_ADDRESS: "0x47a49cCfa1924D5b59cb400708199b6Ae8543D31",
@@ -93,7 +94,11 @@ const {
   PENCILS_ATTESTER_PROXY_ADDRESS,
   Pencils_BASE_URL,
   PASSPORT_SCORE_BADGE_ADDRESS,
+  PASSPORT_SCORE_PROXY_ADDRESS,
+  PASSPORT_SCORE_BASE_URL,
 } = BADGES_ADDRESS[isMainnet ? "mainnet" : "sepolia"]
+
+console.log("isMainnet!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", isMainnet)
 
 const ETHEREUM_YEAR_BASE_URL = `${requireEnv("REACT_APP_CANVAS_BACKEND_URI")}/badge`
 
@@ -216,6 +221,21 @@ export const THIRD_PARTY_BADGES = isMainnet
         baseUrl: Pencils_BASE_URL,
         native: false,
       },
+      {
+        // TODO fix description and logo
+        name: "Passport",
+        badgeContract: PASSPORT_SCORE_BADGE_ADDRESS,
+        attesterProxy: PASSPORT_SCORE_PROXY_ADDRESS,
+        description: "Passport score",
+        baseUrl: PASSPORT_SCORE_BASE_URL,
+        image: "https://raw.githubusercontent.com/gitcoinco/passport/93889216df77f83470b948f5c8b3f48c3b0492b4/app/public/scrollBadgeImages/60%2B.png",
+        issuer: {
+          origin: "https://passport.xyz/",
+          name: "Passport",
+          logo: "https://scroll-eco-list.netlify.app/logos/Zebra.png",
+        },
+        native: false,
+      },
     ]
   : [
       {
@@ -289,31 +309,6 @@ export const THIRD_PARTY_BADGES = isMainnet
         },
         baseUrl: Zebra_BASE_URL,
         native: false,
-      },
-      {
-        // TODO fix description and logo
-        name: "Passport",
-        badgeContract: PASSPORT_SCORE_BADGE_ADDRESS,
-        description: "Passport score",
-        image: "https://app.zebra.xyz/images/badge.png",
-        issuer: {
-          origin: "https://passport.xyz/",
-          name: "Passport",
-          logo: "https://scroll-eco-list.netlify.app/logos/Zebra.png",
-        },
-        native: false,
-        validator: async (provider, address) => {
-          console.log("provider", provider)
-          const passportDecoderContract = new ethers.Contract("0x8A5820030188346cC9532a1dD9FD2EF8d8F464de", GitcoinPassportDecoderABI, provider)
-
-          let score = 0
-          try {
-            const rawScore = await passportDecoderContract.getScore(address)
-            score = parseFloat(ethers.formatUnits(rawScore, 4))
-          } catch {}
-
-          return score > 0
-        },
       },
       // {
       //   name: "Cog Finance",
